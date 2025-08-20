@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Bingo bango bongo bish bash bosh</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    player count: <span id="playercount"></span>
+    <select id="selekt">
+        <option id="blank"></option>
+        <option id="red" value="red">red</option>
+        <option id="blue" value="blue">blue</option>
+    </select>
+    <table>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+    </table>
+    <button id="butt">Wygeneruj bingo</button>
+    <script>
+        const socket = io();
+        const pytania = [
+            "Zdobądź pierwsze osiągnięcie.",
+            "Pokonaj przeciwnika bez utraty życia.",
+            "Wygraj rundę z rzędu.",
+            "Zrób screenshot z gry.",
+            "Otwórz skrzynię lub skrzynkę.",
+            "Znajdź ukryty przedmiot.",
+            "Użyj umiejętności specjalnej.",
+            "Wydaj wszystkie punkty many/energii.",
+            "Ukończ poziom bez skoku.",
+            "Zniszcz wrogą wieżę/bazę/strukturę.",
+            "Wykonaj cios krytyczny.",
+            "Wykorzystaj wszystkie 3 sloty ekwipunku.",
+            "Podnieś przedmiot ze stołu/ziemi.",
+            "Pokonaj przeciwnika tylko przy użyciu podstawowego ataku.",
+            "Zbierz 10 monet.",
+            "Przeżyj 5 minut bez utraty zdrowia.",
+            "Zmień ustawienie w opcjach gry.",
+            "Pokonaj przeciwnika używając tylko jednej broni.",
+            "Wykonaj skok w miejscu trzy razy.",
+            "Otwórz mapę.",
+            "Znajdź przejście do ukrytego obszaru.",
+            "Zrób combo co najmniej 3 ataków.",
+            "Skorzystaj z punktu zapisu gry.",
+            "Zbuduj prostą konstrukcję.",
+            "Zdobądź nowy poziom doświadczenia.",
+            "Ukończ misję poboczną.",
+            "Wydaj wszystkie zebrane punkty.",
+            "Wykonaj unik w ostatniej chwili.",
+            "Znajdź skrót do kolejnego poziomu.",
+            "Wejdź do wody.",
+            "Zaatakuj przeciwnika zza osłony.",
+            "Pokonaj przeciwnika bez użycia broni.",
+            "Przebiegnij przez cały obszar bez zatrzymywania się.",
+            "Zdobądź nowy element ekwipunku.",
+            "Pokonaj dwóch przeciwników w ciągu 30 sekund.",
+            "Zmień broń w trakcie walki.",
+            "Skorzystaj z umiejętności leczenia.",
+            "Podnieś broń przeciwnika.",
+            "Włącz latarkę/pochodnię.",
+            "Wykonaj rzut granatem lub zaklęciem obszarowym.",
+            "Skorzystaj z punktu szybkiej podróży.",
+            "Wejdź na najwyższy punkt mapy.",
+            "Zeskocz z dużej wysokości i przeżyj.",
+            "Otwórz drzwi lub bramę.",
+            "Zniszcz beczkę lub skrzynkę.",
+            "Użyj pojazdu.",
+            "Podnieś klucz do drzwi.",
+            "Zablokuj atak przeciwnika.",
+            "Odbij pocisk.",
+            "Zdobądź broń dystansową.",
+            "Traf w cel z dużej odległości.",
+            "Wygraj walkę w zwarciu.",
+            "Przejdź przez most.",
+            "Znajdź ukrytą wiadomość/napis.",
+            "Wejdź do budynku.",
+            "Skorzystaj z windy.",
+            "Znajdź przedmiot przydatny do zadania.",
+            "Ukończ walkę mając mniej niż 10% zdrowia.",
+            "Wykonaj skok na przeciwnika.",
+            "Otwórz ekwipunek.",
+            "Wydaj wszystkie pociski.",
+            "Użyj teleportu.",
+            "Zdobądź tarczę/ochronę.",
+            "Pokonaj mini-bossa.",
+            "Użyj mikstury lub apteczki.",
+            "Zniszcz minę/pułapkę.",
+            "Uratuj sojusznika.",
+            "Złap przeciwnika w pułapkę.",
+            "Wykonaj atak z zaskoczenia.",
+            "Zablokuj przejście przeciwnikowi.",
+            "Wejdź do tajnego pokoju.",
+            "Przetrwaj falę przeciwników.",
+            "Wygraj w pojedynku 1 na 1.",
+            "Znajdź sekretne przejście.",
+            "Zdobądź maksymalną ilość punktów w jednej akcji.",
+            "Skorzystaj z nowej mechaniki gry.",
+            "Zniszcz element otoczenia.",
+            "Użyj specjalnego ataku przeciwnika przeciwko niemu.",
+            "Wykonaj kontratak.",
+            "Ukończ poziom w określonym czasie.",
+            "Znajdź ukryty przedmiot kolekcjonerski.",
+            "Użyj skradania się.",
+            "Pokonaj przeciwnika zza pleców.",
+            "Skorzystaj z łuku, kuszy lub innej broni dystansowej.",
+            "Rzuć przedmiotem w przeciwnika.",
+            "Otwórz drzwi za pomocą kodu/łamigłówki.",
+            "Przeskocz nad przeszkodą.",
+            "Przebiegnij przez ogień/lawę i przeżyj.",
+            "Zniszcz wieżyczkę obronną.",
+            "Wykonaj atak z powietrza.",
+            "Wykonaj ślizg.",
+            "Użyj specjalnego trybu widzenia (np. noktowizji).",
+            "Zniszcz broń przeciwnika.",
+            "Wejdź do jaskini.",
+            "Włącz dźwignię/przycisk.",
+            "Skorzystaj z mechanizmu obronnego.",
+            "Pokonaj przeciwnika używając wyłącznie pułapek.",
+            "Zdobądź przedmiot leżący na szczycie.",
+            "Użyj dwóch różnych umiejętności w jednej walce.",
+            "Przejdź cały etap bez śmierci."
+        ];
+        let selekt = document.getElementById('selekt')
+        let cells = document.querySelectorAll('.bingo-cell')
+        let button = document.getElementById('butt')
+        let playercount = document.getElementById('playercount')
+        let place = 0
+        socket.on('amount', (playeramount) => {
+            playercount.textContent = playeramount
+        })
+        socket.on('bingo', (bing) => {
+            cells.forEach((cell, index) => {
+                cell.textContent = bing[index]
+            })
+        })
+        cells.forEach((cell, index) => {
+            cell.addEventListener('click', function () {
+                if (selekt.value == "") {
+                    alert("wybierz kolor")
+                }
+                else {
+                    cell.style.backgroundColor = selekt.value
+                    socket.emit('colors', { index, color: selekt.value })
+                }
+
+            })
+
+        });
+        socket.on('colors', (colors) => {
+            cells[colors.index].style.backgroundColor = colors.color
+        })
+        button.addEventListener('click', () => {
+            function shuffle(array) {
+                let currentIndex = array.length;
+
+                while (currentIndex != 0) {
+
+                    let randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex--;
+
+                    [array[currentIndex], array[randomIndex]] = [
+                        array[randomIndex], array[currentIndex]];
+                }
+            }
+            shuffle(pytania)
+            cells.forEach((cell, index) => {
+                cell.textContent = pytania[index]
+            })
+            socket.emit('bingo', pytania)
+        })
+
+    </script>
+</body>
+
+</html>
