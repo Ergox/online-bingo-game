@@ -32,6 +32,12 @@ io.on('connection', (socket) => {
     })
 })
 
+io.on('connection', (socket) => {
+    socket.on('reset', () => {
+        io.emit('reset')
+    })
+})
+
 app.use('/',express.static(join(__dirname, 'static')))
 
 

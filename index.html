@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Bingo bango bongo bish bash bosh</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    Gracze na serwerze <span id="playercount"></span>
+    <select id="selekt">
+        <option id="blank"></option>
+        <option id="red" value="red">red</option>
+        <option id="blue" value="blue">blue</option>
+    </select>
+    aktualna ilość pytań w rotacji <span id="arraylong"></span>
+    <table>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+    </table>
+    <button id="butt">Wygeneruj bingo</button>
+    <button id="reset">Reset</button>
+    <script>
+        const socket = io();
+        const pytania = [
+            "Zdobądź pierwsze osiągnięcie w grze (np. trofeum, odznakę, medal widoczne w interfejsie).",
+            "Pokonaj przeciwnika w walce, nie tracąc żadnych punktów zdrowia.",
+            "Wygraj trzy rundy z rzędu w tym samym trybie gry (jeśli gra posiada tryb rundowy).",
+            "Zrób zrzut ekranu w trakcie aktywnej rozgrywki (nie w menu pauzy).",
+            "Otwórz dowolną skrzynię ze skarbem, lootbox lub podobny pojemnik w grze.",
+            "Znajdź przedmiot ukryty w miejscu, które nie jest od razu widoczne na mapie lub w środowisku.",
+            "Użyj specjalnej umiejętności swojej postaci (np. zdolność Ultimate, zaklęcie, specjalny atak).",
+            "Zużyj wszystkie punkty many/energii lub podobny zasób w trakcie jednej walki.",
+            "Ukończ poziom lub fragment obszaru bez wykonania ani jednego skoku.",
+            "Zniszcz wrogą wieżę, bazę lub inną kluczową strukturę obronną.",
+            "Wykonaj cios krytyczny (widoczny w grze jako \"critical hit\" lub podobne oznaczenie).",
+            "Wypełnij wszystkie trzy sloty ekwipunku (np. broń, pancerz, akcesorium) i użyj ich w grze.",
+            "Podnieś przedmiot leżący na ziemi lub stole w świecie gry.",
+            "Pokonaj przeciwnika używając wyłącznie podstawowego ataku (bez użycia umiejętności specjalnych).",
+            "Zbierz dokładnie 10 monet lub podobnych przedmiotów kolekcjonerskich w jednej rozgrywce/sesji.",
+            "Przeżyj 5 minut rozgrywki (bez pauzy) bez utraty jakichkolwiek punktów zdrowia.",
+            "Zmień dowolne ustawienie w menu opcji gry (np. głośność, rozdzielczość).",
+            "Pokonaj przeciwnika używając tylko jednej broni (bez zmiany broni w trakcie walki).",
+            "Wykonaj trzy skoki w miejscu jeden po drugim.",
+            "Otwórz mapę gry (minimapę lub pełną mapę, jeśli dostępna).",
+            "Znajdź przejście prowadzące do ukrytego obszaru na mapie (np. sekretne drzwi, ścieżka).",
+            "Wykonaj combo składające się z co najmniej 3 ataków lub umiejętności (jeśli gra posiada system combo).",
+            "Skorzystaj z punktu zapisu gry (checkpoint lub save point).",
+            "Zbuduj prostą konstrukcję z dostępnych materiałów (np. ścianę, most, osłonę).",
+            "Zdobądź nowy poziom doświadczenia (level up).",
+            "Ukończ jedną misję poboczną lub opcjonalne zadanie.",
+            "Wydaj wszystkie zebrane punkty doświadczenia lub waluty gry na ulepszenia/przedmioty.",
+            "Wykonaj unik tuż przed ciosem przeciwnika, aby go całkowicie uniknąć.",
+            "Znajdź skrót prowadzący szybciej do kolejnego poziomu lub obszaru.",
+            "Wejdź do wody i pozostań w niej przez co najmniej 5 sekund.",
+            "Zaatakuj przeciwnika zza osłony (np. zza ściany, barykady), pozostając ukrytym.",
+            "Pokonaj przeciwnika bez używania broni (tylko pięści, kopniaki, ataki wręcz postaci).",
+            "Przebiegnij przez cały obszar mapy (znaczący dystans) bez zatrzymywania się.",
+            "Zdobądź nowy element ekwipunku (np. hełm, zbroję, buty, amulet).",
+            "Pokonaj dwóch przeciwników w ciągu 30 sekund.",
+            "Zmień broń w trakcie jednej walki i użyj obu broni.",
+            "Skorzystaj z umiejętności leczenia (np. zaklęcie, mikstura, apteczka).",
+            "Podnieś i użyj broni, którą wcześniej upuścił pokonany przeciwnik.",
+            "Włącz źródło światła (latarka, pochodnia, zaklęcie rozświetlające).",
+            "Rzuć granatem lub zaklęciem obszarowym w grupę przeciwników.",
+            "Skorzystaj z punktu szybkiej podróży (jeśli dostępny w grze).",
+            "Wejdź na najwyższy dostępny punkt na mapie lub w danym obszarze.",
+            "Zeskocz z dużej wysokości i przeżyj upadek.",
+            "Otwórz dowolne drzwi lub bramę.",
+            "Zniszcz interaktywny obiekt (np. beczkę, skrzynkę, zniszczalną ścianę).",
+            "Użyj pojazdu dostępnego w grze (np. samochodu, łodzi, konia).",
+            "Podnieś klucz potrzebny do otwarcia drzwi lub skrzyni.",
+            "Zablokuj atak przeciwnika przy użyciu tarczy lub zdolności blokującej.",
+            "Odbij pocisk przeciwnika (np. mieczem, tarczą, zaklęciem odbijającym).",
+            "Zdobądź broń dystansową (np. łuk, kuszę, pistolet, karabin).",
+            "Traf przeciwnika z dużej odległości (strzał, rzut, umiejętność).",
+            "Wygraj walkę wręcz (bez użycia broni dystansowej).",
+            "Przejdź przez most w grze.",
+            "Znajdź ukrytą wiadomość lub napis w środowisku gry.",
+            "Wejdź do budynku.",
+            "Skorzystaj z windy w grze.",
+            "Znajdź przedmiot przydatny do ukończenia zadania lub rozwiązania łamigłówki.",
+            "Ukończ walkę mając mniej niż 10% punktów zdrowia.",
+            "Wykonaj skok na przeciwnika i zadaj mu obrażenia tym atakiem.",
+            "Otwórz ekwipunek postaci.",
+            "Wystrzel wszystkie pociski ze swojej broni (opróżnij magazynek).",
+            "Użyj teleportu w grze (jeśli dostępny).",
+            "Zdobądź tarczę lub tymczasowy efekt ochrony.",
+            "Pokonaj mini-bossa (silniejszy przeciwnik przed bossem końcowym).",
+            "Użyj mikstury lub apteczki w celu odnowienia zdrowia/many.",
+            "Zniszcz minę lub pułapkę zastawioną przez przeciwnika.",
+            "Uratuj sojusznika przed śmiercią (np. ożywiając go, osłaniając).",
+            "Złap przeciwnika w pułapkę (zastawioną przez ciebie lub środowisko).",
+            "Wykonaj atak z zaskoczenia (np. od tyłu, z ukrycia).",
+            "Zablokuj przeciwnikowi przejście w wąskim korytarzu lub drzwiach.",
+            "Wejdź do tajnego pokoju lub ukrytej lokacji.",
+            "Przetrwaj falę przeciwników.",
+            "Wygraj w pojedynku 1 na 1 z innym graczem lub silnym przeciwnikiem.",
+            "Znajdź sekretne przejście.",
+            "Zdobądź maksymalną ilość punktów w jednej akcji/combo/wyzwaniu.",
+            "Skorzystaj z nowej mechaniki gry (np. craftingu, systemu modyfikacji).",
+            "Zniszcz element otoczenia (np. drzwi, mur, ścianę, którą można zburzyć).",
+            "Użyj ataku przeciwnika przeciwko niemu (np. odbij pocisk, sprowokuj atak).",
+            "Wykonaj kontratak tuż po ataku przeciwnika.",
+            "Ukończ poziom lub zadanie w określonym limicie czasu.",
+            "Znajdź ukryty przedmiot kolekcjonerski.",
+            "Użyj skradania się, aby nie zostać wykrytym przez przeciwników.",
+            "Pokonaj przeciwnika atakiem zza pleców.",
+            "Pokonaj przeciwnika używając tylko łuku, kuszy lub innej broni dystansowej.",
+            "Rzuć dowolnym przedmiotem (nie bronią) w przeciwnika.",
+            "Otwórz drzwi wymagające kodu lub rozwiązania łamigłówki.",
+            "Przeskocz nad przeszkodą.",
+            "Przebiegnij przez ogień lub lawę i przeżyj.",
+            "Zniszcz wieżyczkę obronną lub stałe stanowisko strzeleckie.",
+            "Wykonaj atak z powietrza (w trakcie skoku, spadania).",
+            "Wykonaj ślizg postacią.",
+            "Użyj specjalnego trybu widzenia (np. noktowizji, termowizji, trybu detektywa).",
+            "Zniszcz broń przeciwnika (jeśli to możliwe w grze).",
+            "Wejdź do jaskini.",
+            "Włącz dźwignię lub przycisk aktywujący mechanizm.",
+            "Skorzystaj z mechanizmu obronnego (np. sterując armatą, wieżyczką).",
+            "Pokonaj przeciwnika używając wyłącznie pułapek.",
+            "Zdobądź przedmiot znajdujący się na szczycie konstrukcji (np. wieży, wzgórza).",
+            "Użyj dwóch różnych umiejętności w jednej walce.",
+            "Przejdź cały etap bez śmierci.",
+            "Pokonaj przeciwnika o wyższym poziomie niż twoja postać.",
+            "Użyj tylko jednej mikstury lub apteczki w trakcie całej rozgrywki (aż do końca sesji/misji).",
+            "Zniszcz obiekt, który wywoła eksplozję i pokonaj nim przeciwnika.",
+            "Przejdź przez obszar gry bez korzystania z minimapy (jeśli dostępna).",
+            "Ukończ walkę mając maksymalnie 1 punkt zdrowia.",
+            "Pokonaj przeciwnika wyłącznie z dystansu (bez walki wręcz).",
+            "Znajdź i otwórz skrzynię wymagającą specjalnego klucza.",
+            "Zniszcz 5 interaktywnych obiektów (np. beczki, skrzynie, lampy) podczas jednej misji.",
+            "Wejdź w interakcję z NPC-em, który nie jest związany z żadnym zadaniem głównym ani pobocznym.",
+            "Pokonaj trzech przeciwników tym samym rodzajem ataku (np. tylko atakiem wręcz, tylko strzałem z łuku).",
+            "Zdobądź nową broń i użyj jej w tej samej walce/sekcji rozgrywki.",
+            "Wykonaj 5 uników z rzędu w trakcie jednej walki.",
+            "Zneutralizuj przeciwnika, nie zadając mu żadnego obrażenia (np. ogłuszenie, uśpienie, paraliż).",
+            "Pokonaj przeciwnika wyłącznie przy użyciu ataków z powietrza (atakując z wyskoku).",
+            "Przejdź etap bez użycia żadnych umiejętności specjalnych."
+        ];
+
+        let selekt = document.getElementById('selekt')
+        let cells = document.querySelectorAll('.bingo-cell')
+        let button = document.getElementById('butt')
+        let playercount = document.getElementById('playercount')
+        let reset = document.getElementById('reset')
+        let arraylong = document.getElementById('arraylong')
+        let place = 0
+        socket.on('amount', (playeramount) => {
+            playercount.textContent = playeramount
+        })
+
+        window.addEventListener('load', function() {
+            arraylong.textContent = pytania.length
+        })
+
+        socket.on('bingo', (bing) => {
+            cells.forEach((cell, index) => {
+                cell.textContent = bing[index]
+            })
+        })
+
+
+        cells.forEach((cell, index) => {
+            cell.addEventListener('click', function () {
+                if (selekt.value == "") {
+                    alert("wybierz kolor")
+                }
+                else {
+                    cell.style.backgroundColor = selekt.value
+                    socket.emit('colors', { index, color: selekt.value })
+                }
+
+            })
+
+        });
+
+
+        socket.on('colors', (colors) => {
+            cells[colors.index].style.backgroundColor = colors.color
+        })
+
+
+        button.addEventListener('click', () => {
+            function shuffle(array) {
+                let currentIndex = array.length;
+
+                while (currentIndex != 0) {
+
+                    let randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex--;
+
+                    [array[currentIndex], array[randomIndex]] = [
+                        array[randomIndex], array[currentIndex]];
+                }
+            }
+            shuffle(pytania)
+            cells.forEach((cell, index) => {
+                cell.textContent = pytania[index]
+            })
+            socket.emit('bingo', pytania)
+        })
+
+
+        reset.addEventListener('click', function() {
+            cells.forEach(cell => {
+                cell.style.backgroundColor = "transparent"
+                cell.textContent = ""
+            })
+            socket.emit('reset')
+        })
+        socket.on('reset', () => {
+            cells.forEach(cell => {
+                cell.style.backgroundColor = "transparent"
+                cell.textContent = ""
+            })
+            })
+    </script>
+</body>
+
+</html>
