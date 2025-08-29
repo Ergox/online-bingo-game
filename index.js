@@ -11,6 +11,7 @@ const io = new Server(server);
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 let playeramount = 0
+
 io.on('connection', (socket) => {
     playeramount++
     io.emit('amount',playeramount)
@@ -21,20 +22,23 @@ io.on('connection', (socket) => {
 })
 
 io.on('connection', (socket) => {
+    socket.on('joinRoom', (roomName) =>{
+        socket.join(roomName);
+        socket.roomName = roomName
+    })
+
+    
+
     socket.on('bingo', (bing) => {
-        socket.broadcast.emit('bingo', (bing))
+        io.to(socket.roomName).emit('bingo', (bing))
     })
-})
 
-io.on('connection', (socket) => {
     socket.on('colors' ,(colors) => {
-        socket.broadcast.emit('colors', (colors))
+        io.to(socket.roomName).emit('colors', (colors))
     })
-})
 
-io.on('connection', (socket) => {
     socket.on('reset', () => {
-        io.emit('reset')
+        io.to(socket.roomName).emit('reset')
     })
 })
 

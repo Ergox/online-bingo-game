@@ -59,19 +59,20 @@ table {
 }
 
 /* Przycisk */
-#butt {
+#butt, #reset {
     background: #e74c3c;
     color: white;
     border: none;
     border-radius: 12px;
     padding: 12px 25px;
+    margin: 5px;
     font-size: 1rem;
     cursor: pointer;
     font-weight: bold;
     transition: background 0.3s, transform 0.2s;
 }
 
-#butt:hover {
+#butt:hover, #reset:hover {
     background: #c0392b;
     transform: scale(1.05);
 }

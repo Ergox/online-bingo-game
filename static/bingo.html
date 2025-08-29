@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Bingo bango bongo bish bash bosh</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    Gracze na serwerze <span id="playercount"></span>
+    <select id="selekt">
+        <option id="blank"></option>
+        <option id="red" value="red">red</option>
+        <option id="blue" value="blue">blue</option>
+    </select>
+    aktualna ilość pytań w rotacji <span id="arraylong"></span>
+    <table>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+        <tr>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+            <td class="bingo-cell">&nbsp;</td>
+        </tr>
+    </table>
+    <button id="butt">Wygeneruj bingo</button>
+    <button id="reset">Reset</button>
+    <script type="text/javascript" src="/scripts.js">
+        
+    </script>
+</body>
+
+</html>
